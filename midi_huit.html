@@ -1,0 +1,110 @@
+<html>
+    <head>
+        <title>Midi Huit</title>
+    </head>
+    <body>
+        <table>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+        <script>
+            const tds = document.querySelectorAll("td");
+
+            tds.forEach(td => {
+            const tr = td.closest("tr");
+            if (!tr) return;
+
+            const rowIndex = Array.from(tr.parentElement.children).indexOf(tr);
+            const cellIndex = Array.from(tr.children).indexOf(td);
+
+            if (rowIndex%2 === 0 && cellIndex%2 === 0) {
+                td.style = "width : 40px; height : 40px; border : black solid; background-color: #ee0;  ";
+            }
+            else if (rowIndex%2 === 1 && cellIndex%2 === 1) {
+                td.style = "width : 40px; height : 40px; border : black solid; background-color: #ee0;  ";
+            }
+            else {
+                td.style = "width : 40px; height : 40px; border : black solid; background-color: #960;  ";
+            };
+            });
+        </script>
+    </body>
+</html>
