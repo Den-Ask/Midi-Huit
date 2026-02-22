@@ -1,110 +1,392 @@
-<html>
-    <head>
-        <title>Midi Huit</title>
-    </head>
-    <body>
-        <table>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </table>
-        <script>
-            const tds = document.querySelectorAll("td");
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Midi-Huit v0.2.0.1</title>
+<style>
+body { font-family:sans-serif; background:#eee; }
+#ui { width:520px; margin:auto; text-align:center; }
+#board {
+  display:grid;
+  grid-template-columns: repeat(8, 60px);
+  grid-template-rows: repeat(8, 60px);
+  gap:2px;
+  margin:20px auto;
+}
+.cell {
+  width:60px; height:60px;
+  display:flex; align-items:center; justify-content:center;
+  background:#ccc; cursor:pointer; font-size:48px;
+}
+.cell.dark { background:#aaa; }
+.p2 { color:blue; }
+.p1 { color:red; }
+.selected { outline:3px solid gold; }
+#actions button { margin:4px; }
+.options {
+  display:grid;
+  grid-template-columns: repeat(8, 60px);
+  grid-template-rows: repeat(1, 60px);
+  gap:2px;
+  margin:20px auto;
+}
+.j1 {
+  width:60px; height:60px;
+  display:flex; align-items:center; justify-content:center;
+  background:#faa; cursor:pointer; font-size:48px;
+}
+.j2 {
+  width:60px; height:60px;
+  display:flex; align-items:center; justify-content:center;
+  background:#faa; cursor:pointer; font-size:48px;
+}
+</style>
+</head>
+<body>
 
-            tds.forEach(td => {
-            const tr = td.closest("tr");
-            if (!tr) return;
+<div id="ui">
+  <div class="options" id="options2">
+    <div class="j2 cA p2">✦</div>
+    <div class="j2 cD p2">■</div>
+    <div class="j2 cT p2">▲</div>
+    <div class="j2 p2">●</div>
+    <div class="j2 p2"></div>
+    <div class="j2 rA p2">✦</div>
+    <div class="j2 rD p2">■</div>
+    <div class="j2 rT p2">▲</div>
+  </div>
+  <div id="status"></div>
+  <div id="board"></div>
+  <div id="actions"></div>
+  <div class="options" id="options1">
+    <div class="j1 cA p1">✦</div>
+    <div class="j1 cD p1">■</div>
+    <div class="j1 cT p1">▲</div>
+    <div class="j1 p1">●</div>
+    <div class="j1 p1"></div>
+    <div class="j1 rA p1">✦</div>
+    <div class="j1 rD p1">■</div>
+    <div class="j1 rT p1">▲</div>
+  </div>
+  <button onclick="initialisation()">HH</button>
+</div>
 
-            const rowIndex = Array.from(tr.parentElement.children).indexOf(tr);
-            const cellIndex = Array.from(tr.children).indexOf(td);
+<script>
+const SIZE = 8;
+let bankMpesa = 10;
+const TYPES = { A:"✦", D:"■", T:"▲", C:"●" };
 
-            if (rowIndex%2 === 0 && cellIndex%2 === 0) {
-                td.style = "width : 40px; height : 40px; border : black solid; background-color: #ee0;  ";
-            }
-            else if (rowIndex%2 === 1 && cellIndex%2 === 1) {
-                td.style = "width : 40px; height : 40px; border : black solid; background-color: #ee0;  ";
-            }
-            else {
-                td.style = "width : 40px; height : 40px; border : black solid; background-color: #960;  ";
-            };
-            });
-        </script>
-    </body>
+let board=[...Array(8)].map(()=>Array(8).fill(null));
+let options=[...Array(1)].map(()=>Array(8).fill(null));
+let players={1:{m:1},2:{m:0}};
+let current=1,selected=null,mode=null;
+let sacrifices={A:null,D:null,T:null};
+
+option1 = [
+  { p: 1, t: "A" }, 
+  { p: 1, t: "D" }, 
+  { p: 1, t: "T" }, 
+  { p: 1, t: "C" }, 
+  null, 
+  { p: 1, t: "A" }, 
+  { p: 1, t: "D" }, 
+  { p: 1, t: "T" }
+];
+option2 = [
+  { p: 2, t: "A" }, 
+  { p: 2, t: "D" }, 
+  { p: 2, t: "T" }, 
+  { p: 2, t: "C" }, 
+  null, 
+  { p: 2, t: "A" }, 
+  { p: 2, t: "D" }, 
+  { p: 2, t: "T" }
+];
+
+document.querySelector("button").addEventListener(click, initialisation());
+options[0][0] = { p: 1, t: "T" };
+// placement initial minimal
+function initialisation () {
+    for(let y=0;y<8;y++)for(let x=0;x<8;x++){
+        board [x] [y] = null;
+    };
+    board[7][0] = { p: 1, t: "T" };
+    board[7][1] = { p: 1, t: "T" };
+    board[7][2] = { p: 1, t: "D" };
+    board[7][4] = { p: 1, t: "C" };
+    board[7][5] = { p: 1, t: "D" };
+    board[7][6] = { p: 1, t: "A" };
+    board[7][7] = { p: 1, t: "A" };
+    board[0][0] = { p: 2, t: "T" };
+    board[0][1] = { p: 2, t: "T" };
+    board[0][2] = { p: 2, t: "D" };
+    board[0][4] = { p: 2, t: "C" };
+    board[0][5] = { p: 2, t: "D" };
+    board[0][6] = { p: 2, t: "A" };
+    board[0][7] = { p: 2, t: "A" };
+    players [1].m = 1;
+    players [2].m = 0;
+    current = 1;
+    bankMpesa = 9;
+    current=1
+    selected=null
+    mode=null;
+    render();
+};
+
+function isThreatened(x,y){
+  for(let yy=0;yy<8;yy++)for(let xx=0;xx<8;xx++){
+    let p=board[yy][xx];
+    if(p&&p.p!==current){
+      if(moves(xx,yy).some(m=>m[0]===x&&m[1]===y))
+        return true;
+    }
+  }
+  return false;
+}
+
+function hasCommander(player){
+  return board.flat().some(p=>p&&p.p===player&&p.t==="C");
+}
+
+function hasAllUnits(p){
+  return ["A","D","T"].every(t =>
+    board.flat().some(u=>u&&u.p===p&&u.t===t)
+  );
+}
+
+function unitsPopulation () {
+  joueur=current===1?2:1;
+  let unites = ["A","D","T"];
+  let unity = {"A" : 0,"D" : 0,"T" : 0};
+  for(let yy=0;yy<8;yy++)for(let xx=0;xx<8;xx++){
+    let p=board[yy][xx];
+    if(p&&p.p!==joueur&&p.t!=="C") {
+      unity[p.t]+=1;
+    };
+    if (p&&p.p!==joueur&&unity[p.t]>=3) unites = unites.filter(element => element !== p.t);
+  };
+  return unites;
+};
+
+function superior(a,d){
+  if(d==="C"&&a!=="C")return 1;
+  if(a==="C"&&d!=="C")return -1;
+  if(a===d)return 0;
+  if((a==="A"&&d==="T")||(a==="T"&&d==="D")||(a==="D"&&d==="A"))return 1;
+  return -1;
+}
+
+function inBounds(x,y){return x>=0&&x<8&&y>=0&&y<8;}
+
+function countUnits(player,type){
+  return board.flat().filter(p=>p&&p.p===player&&p.t===type).length;
+}
+
+function adjacent(x,y){
+  let res=[];
+  for(let dx=-1;dx<=1;dx++)
+    for(let dy=-1;dy<=1;dy++)
+      if(dx||dy){
+        let nx=x+dx, ny=y+dy;
+        if(inBounds(nx,ny)) res.push([nx,ny]);
+      }
+  return res;
+}
+
+function moves(x,y){
+  let p=board[y][x]; 
+  if(!p) return [];
+  let r=adjacent(x,y);
+
+  function addIfClear(nx,ny){
+    if(inBounds(nx,ny) && pathClear(x,y,nx,ny)) r.push([nx,ny]);
+  }
+
+  if(p.t==="A"){
+    let d=p.p===1?-1:1;
+    addIfClear(x+2,y+2*d);
+    addIfClear(x-2,y+2*d);
+  }
+
+if(p.t==="D"){
+  let d=p.p===1?1:-1;
+  for(let i=1;i<=3;i++){
+    let ny=y+i*d;
+    if(!inBounds(x,ny)) break;
+
+    if(board[ny][x]){
+      if(board[ny][x].p!==p.p) r.push([x,ny]);
+      break;
+    }
+    r.push([x,ny]);
+  }
+}
+if(p.t==="T"){
+  let d=p.p===1?-1:1;
+  for(let i=1;i<=3;i++){
+    let ny=y+i*d;
+    if(!inBounds(x,ny)) break;
+
+    if(board[ny][x]){
+      if(board[ny][x].p!==p.p) r.push([x,ny]);
+      break;
+    }
+    r.push([x,ny]);
+  }
+}
+  return r;
+}
+function pathClear(x1,y1,x2,y2){
+  let dx=Math.sign(x2-x1);
+  let dy=Math.sign(y2-y1);
+  let x=x1+dx, y=y1+dy;
+  while(x!==x2||y!==y2){
+    if(board[y][x]) return false;
+    x+=dx; y+=dy;
+  }
+  return true;
+}
+
+function render(){
+  document.getElementById("status").textContent=
+    `Joueur ${current} — Mpesa: ${players[current].m} | Banque: ${bankMpesa}`;
+  let act=document.getElementById(`options${current}`);
+  act.innerHTML="";
+  if(selected){
+    let p=board[selected.y][selected.x];
+    if(p&&p.p===current){
+      if(p.t==="C"){
+        unitsPopulation().forEach(t=>{
+          if(players[current].m>=1){
+            let d = document.querySelector(`.c${t}.p${current}`);
+            d.style("background : afa;")
+            d.onclick=()=>mode="create-"+t;
+          }
+        });
+      }
+      if(["A","D","T"].includes(p.t)&&!isThreatened(selected.x,selected.y)
+         &&players[current].m>=3){
+        unitsPopulation().filter(t=>t!==p.t).forEach(t=>{
+          let b=document.createElement("button");
+          b.textContent="Remplacer → "+t;
+          b.onclick=()=>{
+            p.t=t;
+            players[current].m-=3;
+            bankMpesa+=3;
+            endTurn();
+          };
+          act.appendChild(b);
+        });
+      }
+    }
+  }
+  if(!hasCommander(current)&&players[current].m>=5&&mode!== "sacrifice"){
+    let b=document.createElement("button");
+    b.textContent="Créer Commandant";
+    b.onclick=()=>{
+      mode="sacrifice";
+      sacrifices={A:null,D:null,T:null};
+      render();
+    };
+    act.appendChild(b);
+  }
+
+  let g=document.getElementById("board");
+  g.innerHTML="";
+  for(let y=0;y<8;y++)for(let x=0;x<8;x++){
+    let c=document.createElement("div");
+    c.className="cell"+((x+y)%2?" dark":"");
+    let p=board[y][x];
+    if(p){
+      c.textContent=TYPES[p.t];
+      c.classList.add("p"+p.p);
+      if(selected&&selected.x===x&&selected.y===y)c.classList.add("selected");
+    }
+    c.onclick=()=>click(x,y);
+    g.appendChild(c);
+  }
+}
+
+function click(x,y){
+  let p=board[y][x];
+
+  if(mode&&mode.startsWith("create")&&selected){
+    if(!board[y][x]&&adjacent(selected.x,selected.y)
+      .some(a=>a[0]===x&&a[1]===y)){
+      board[y][x]={p:current,t:mode.split("-")[1]};
+      players[current].m--;
+      bankMpesa++;
+      mode=null;
+      endTurn();
+    }
+    return;
+  }
+
+  if(mode==="sacrifice"){
+    if(p && p.p===current && ["A","D","T"].includes(p.t) && !sacrifices[p.t]){
+      sacrifices[p.t]=true;
+      board[y][x]=null;
+
+      if(Object.values(sacrifices).every(v=>v)){
+        mode="placeCommander";
+      }
+      render();
+    }
+    return;
+  }
+
+  // PLACEMENT COMMANDANT
+  if(mode==="placeCommander"){
+    let row=current===1?7:0;
+    if(y===row && !board[y][x]){
+      board[y][x]={p:current,t:"C"};
+      players[current].m-=5;
+      bankMpesa+=5;
+      mode=null;
+      endTurn();
+    }
+    return;
+  }
+
+  if(selected){
+    let f=selected;
+    if(p&&p.p===current){ selected={x,y}; render(); return; }
+    if(!moves(f.x,f.y).some(m=>m[0]===x&&m[1]===y)){
+      selected=null; render(); return;
+    }
+    if(p){
+      let r=superior(board[f.y][f.x].t,p.t);
+      if(r>=0) board[y][x]=board[f.y][f.x];
+      if(r===0) board[y][x]=null;
+      board[f.y][f.x]=null;
+    }else{
+      board[y][x]=board[f.y][f.x];
+      board[f.y][f.x]=null;
+    }
+    endTurn(); return;
+  }
+  if(p&&p.p===current) selected={x,y};
+  render();
+}
+
+function option () {
+  return null;
+}
+function endTurn(){
+  selected=null;
+  actionDone=true;
+  current=current===1?2:1;
+  if(bankMpesa>0){
+    players[current].m++;
+    bankMpesa--;
+  };
+  actionDone=false;
+  render();
+}
+
+initialisation();
+</script>
+
+</body>
 </html>
