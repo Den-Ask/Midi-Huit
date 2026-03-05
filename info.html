@@ -1,0 +1,69 @@
+<head>
+    <meta charset="UTF-8">
+    <title>Midi Huit - Informations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        ul {
+            list-style-type: square;
+            margin: 0px;
+        }
+         li {
+            margin: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    Midi Huit est un jeu de strarége à deux joueurs basé sur le pierre-feuille-ciseaux avec des éléments de contrôle de territoire et de gestion de ressources.<br>
+    Le but du jeu est d'élliminer toutes les pièces de l'adversaire.<br>
+    Chaque joueur contrôle une armée composée de différentes unités, chacune ayant ses propres forces et faiblesses.<br>
+    <h3>Règles</h3>
+    <h4>Pièces, déplacement et faiblesses</h4>
+    Les joueurs ont quatre types de pièces qui peuvent se déplacer de une case dans toutes les direction avec chacune des déplacement spéciaux:
+    <ul>
+        <li>L'Attaquant (représenté par ✦) : Il est faible contre le Défenseur et 	peut avancer de deux cases en diagonale</li>
+        <li>Le Défenseur (représenté par ■) : Il est faible contre le Tireur et peut reculer de trois cases</li>
+        <li>Le Tireur (représenté par ▲) : Il est faible contre l'Attaquant et peut avancer de trois cases</li>
+        <li>Le Comandant (représenté par ●) : Il est faible contre toutes les autres pièces et se déplace normalement</li>
+    </ul>
+    Pour attaquer une pièce adverse, il faut se placer dans la même case qu'elle.<br>
+    Selon le type de chaque pièce belligérante qui se rencontrent, le résultat sera différant :
+    <ul>
+        <li>Si l'assaillant est plus fort, il remplace la cible</li>
+        <li>Si l'assaillant est équivalant, il disparait avec la victime</li>
+        <li>Si l'assaillant est plus faible, il disparait tous seul</li>
+    </ul>
+    <h4>La monnaie</h4>
+    Le jeu a une économie basée sur une monnaie appelée le Mpesa.<br>
+    Il y a 10 Mpesa en circulation dans la partie.<br>
+    Avant de jouer son tour, le joueur reçoit 1 Mpesa (si il en reste).<br>
+    Les Mpesa sont consommés (et renvoyés à la banque) pour faires différentes actions spéciales :
+    <ul>
+        <li>Le joueur peut créer une unité (✦/■/▲) à côté de son commandant (si il est encore en jeu) contre 1 Mpesa si il a mois de trois unités du type qu'il veut créer</li>
+        <li>Le joueur peut changer le type d'une unité (ex : ▲ → ✦) contre 3 Mpesa si l'unité n'est pas menacée et qu'il a mois de trois unités du type qu'il veut créer</li>
+        <li>Le joueur peut créer un nouveau commandant (si il n'en a plus) sur une case libre de sa première ligne contre 5 Mpesa et un sacrifice de une unité de chaque type</li>
+    </ul>
+    <h3>Jeu</h3>
+    Cliquer sur une unité pour la sélectionner, puis cliquer sur une case adjacente pour la déplacer ou sur une case occupée par une unité adverse pour l'attaquer.<br>
+    Il est impossible de passer par dessus une unité, même pour les déplacements spéciaux.<br>
+    Chaque joueur à de une barre d'options pour créer ou modifier une pièce :<br>
+    <ul>
+        <li>Côté Tireur (à gauche du joueur 1) pour la création</li>
+        <li>Côté Attaquant (à droite du joueur 1) pour la modification</li>
+    </ul>
+    La case d'une option est par déffaut grise : Elle deviens verte si le joueur peut utiliser l'option.<br>
+    Les cases sont toutes rouges si le joueur est en mode sacrifice puis vertes si le joueur est en mode invocation de commandant.<br>
+    Cliquer sur l'unité de création après avoit sellectionné le commandant puis sur une case adjacente à au commandant pour créer une nouvelle unité de ce type (si les conditions sont remplies).<br>
+    Cliquer sur une unité déjà en jeu puis sur une option de modification pour changer son type (si les conditions sont remplies).<br>
+    Cliquer sur l'option de création du commandant puis cliquer sur les pièces pièces qui seront sacrifiées pour créer un nouveau commandant (si les conditions sont remplies).<br>
+    Cliquer sur le boutton "HH" pour réinitialiser la partie.<br>
+    Cliquer sur le boutton "ℹ" pour afficher ces informations.<br>
+</body>

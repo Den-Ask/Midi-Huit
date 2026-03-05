@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Midi-Huit v0.2.1</title>
+<title>Midi-Huit v0.2.4</title>
 <style>
 body { font-family:sans-serif; background:#eee; }
 #ui { width:520px; margin:auto; text-align:center; }
@@ -34,13 +34,17 @@ body { font-family:sans-serif; background:#eee; }
   width:60px; height:60px;
   display:flex; align-items:center; justify-content:center;
   background:#777; cursor:pointer; font-size:48px;
-  color: red;
 }
 .j2 {
   width:60px; height:60px;
   display:flex; align-items:center; justify-content:center;
   background:#777; cursor:pointer; font-size:48px;
-  color: blue;
+}
+#info {
+  position : fixed;
+  top : 20px;
+  right : 20px;
+  width : 10px;
 }
 </style>
 </head>
@@ -48,12 +52,32 @@ body { font-family:sans-serif; background:#eee; }
 
 <div id="ui">
   <div id="status"></div>
-  <div class="options 2"></div>
+  <div class="options">
+    <div class="j2 cA p2">✦</div>
+    <div class="j2 cD p2">■</div>
+    <div class="j2 cT p2">▲</div>
+    <div class="j2 cC p2">●</div>
+    <div class="j2 p2"></div>
+    <div class="j2 rA p2">✦</div>
+    <div class="j2 rD p2">■</div>
+    <div class="j2 rT p2">▲</div>
+  </div>
   <div id="board"></div>
   <div id="actions"></div>
-  <div class="options 1"></div>
+  <div class="options">
+    <div class="j1 cA p1">✦</div>
+    <div class="j1 cD p1">■</div>
+    <div class="j1 cT p1">▲</div>
+    <div class="j1 cC p1">●</div>
+    <div class="j1 p1"></div>
+    <div class="j1 rA p1">✦</div>
+    <div class="j1 rD p1">■</div>
+    <div class="j1 rT p1">▲</div>
+  </div>
   <button onclick="initialisation()">HH</button>
 </div>
+
+<button id = "info" onclick="informations()">ℹ</button>
 
 <script>
 const SIZE = 8;
@@ -65,52 +89,34 @@ let players={1:{m:1},2:{m:0}};
 let current=1,selected=null,mode=null;
 let sacrifices={A:null,D:null,T:null};
 
-
-document.querySelector("button").addEventListener(click, initialisation());
+document.querySelector("button").addEventListener("click", initialisation());
 // placement initial minimal
 function initialisation () {
-  for (ele of ["1", "2"]) {
-    let options = document.getElementsByClassName (`options ${ele}`);
-    console.log (options);
-    let choix = document.createElement ("div");
-    for (elem of ["A", "D", "T", "C"]) {
-      choix.className = `j${ele} c${elem}`;
-      choix.textContent = TYPES[elem];
-      options.appendChild(choix);
+    for(let y=0;y<8;y++)for(let x=0;x<8;x++){
+        board [x] [y] = null;
     };
-    choix.className = `j${ele}`;
-    options.appendChild(choix);
-    for (elem of ["A", "D", "T"]) {
-      choix.className = `j${ele} r${elem}`;
-      choix.textContent = TYPES[elem];
-      options.appendChild(choix);
-    };
-  };
-  for(let y=0;y<8;y++)for(let x=0;x<8;x++){
-      board [x] [y] = null;
-  };
-  board[7][0] = { p: 1, t: "T" };
-  board[7][1] = { p: 1, t: "T" };
-  board[7][2] = { p: 1, t: "D" };
-  board[7][4] = { p: 1, t: "C" };
-  board[7][5] = { p: 1, t: "D" };
-  board[7][6] = { p: 1, t: "A" };
-  board[7][7] = { p: 1, t: "A" };
-  board[0][0] = { p: 2, t: "T" };
-  board[0][1] = { p: 2, t: "T" };
-  board[0][2] = { p: 2, t: "D" };
-  board[0][4] = { p: 2, t: "C" };
-  board[0][5] = { p: 2, t: "D" };
-  board[0][6] = { p: 2, t: "A" };
-  board[0][7] = { p: 2, t: "A" };
-  players [1].m = 1;
-  players [2].m = 0;
-  current = 1;
-  bankMpesa = 9;
-  current=1
-  selected=null
-  mode=null;
-  render();
+    board[7][0] = { p: 1, t: "T" };
+    board[7][1] = { p: 1, t: "T" };
+    board[7][2] = { p: 1, t: "D" };
+    board[7][4] = { p: 1, t: "C" };
+    board[7][5] = { p: 1, t: "D" };
+    board[7][6] = { p: 1, t: "A" };
+    board[7][7] = { p: 1, t: "A" };
+    board[0][0] = { p: 2, t: "T" };
+    board[0][1] = { p: 2, t: "T" };
+    board[0][2] = { p: 2, t: "D" };
+    board[0][4] = { p: 2, t: "C" };
+    board[0][5] = { p: 2, t: "D" };
+    board[0][6] = { p: 2, t: "A" };
+    board[0][7] = { p: 2, t: "A" };
+    players [1].m = 1;
+    players [2].m = 0;
+    current = 1;
+    bankMpesa = 9;
+    current=1
+    selected=null
+    mode=null;
+    render();
 };
 
 function isThreatened(x,y){
@@ -232,44 +238,69 @@ function render(){
     `Joueur ${current} — Mpesa: ${players[current].m} | Banque: ${bankMpesa}`;
   let act=document.getElementById("actions");
   act.innerHTML="";
+  let lat = document.querySelectorAll('.j1, .j2')
+  // Réinitialisation des couleurs des gestionnaires d'événements des tuiles d'options sous condition de mode
+  lat.forEach(el => el.style.background = mode!=="sacrifice"&&mode!=="placeCommander"?'#777'
+    :mode==="sacrifice"?"#faa"
+    :mode==="placeCommander"?"#afa"
+    :"#777");
+  lat.forEach(el => el.onclick = null); // reset option tile click handlers
+  lat.forEach(el => el.classList.remove('selected')); // reset option tile availability
   if(selected){
     let p=board[selected.y][selected.x];
     if(p&&p.p===current){
-      if(p.t==="C"){
-        unitsPopulation().forEach(t=>{
-          if(players[current].m>=1){
-            let b=document.createElement("button");
-            b.textContent="Créer "+t;
-            b.onclick=()=>mode="create-"+t;
-            act.appendChild(b);
-          }
-        });
-      }
-      if(["A","D","T"].includes(p.t)&&!isThreatened(selected.x,selected.y)
-         &&players[current].m>=3){
-        unitsPopulation().filter(t=>t!==p.t).forEach(t=>{
-          let b=document.createElement("button");
-          b.textContent="Remplacer → "+t;
-          b.onclick=()=>{
-            p.t=t;
-            players[current].m-=3;
-            bankMpesa+=3;
-            endTurn();
-          };
-          act.appendChild(b);
-        });
-      }
+      // Allow clicking the option tiles (.j1 / .j2) to enter create-<t> mode
+        let options = document.querySelectorAll('.j1, .j2');
+        options.forEach(function(el){
+          // derive type from class or displayed symbol
+          let t = null;
+          unitsPopulation().forEach(function(ch){
+            if(el.classList.contains('c'+ch) && el.classList.contains('p'+current)){
+              el.style.background = (p.t==="C")?'#afa':'#777';
+              el.onclick = function(){
+                el.classList.add('selected');
+                let owner = el.classList.contains('j1')?1:2;
+                if(owner !== current) return; // only current player can initiate create mode
+                if(!ch) return;
+                // select the player's commander if present
+                let found=false;
+                for(let yy=0; yy<8 && !found; yy++){
+                  for(let xx=0; xx<8 && !found; xx++){
+                    let p = board[yy][xx];
+                    if(p && p.p===owner && p.t==='C'){
+                      selected = { x: xx, y: yy };
+                      found = true;
+                    }
+                  }
+                }
+                if(!found) return;
+                mode = 'create-'+ch;
+                render();
+              };
+            };
+            if(el.classList.contains('r'+ch)&&el.classList.contains('p'+current)&&["A","D","T"].includes(p.t)&&!isThreatened(selected.x,selected.y)&&players[current].m>=3&&p.t!==ch){
+              el.style.background =  mode!=="sacrifice"&&mode!=="placeCommander"?'#afa':'#777';
+              el.onclick=()=>{
+                p.t=ch;
+                players[current].m-=3;
+                bankMpesa+=3;
+                endTurn();
+              };
+            }
+          });
+        }
+      );
+
     }
   }
-  if(!hasCommander(current)&&players[current].m>=5&&mode!== "sacrifice"){
-    let b=document.className = "j1 cC";
-    b.textContent="Créer Commandant";
-    b.onclick=()=>{
+  if(!hasCommander(current)&&players[current].m>=5&&mode!== "sacrifice"&&mode!=="placeCommander"){
+    let el = document.querySelector(`.j${current}.cC.p${current}`);
+    el.style.background = '#afa';
+    el.onclick=()=>{
       mode="sacrifice";
       sacrifices={A:null,D:null,T:null};
       render();
     };
-    act.appendChild(b);
   }
 
   let g=document.getElementById("board");
@@ -366,6 +397,10 @@ function endTurn(){
 }
 
 initialisation();
+
+function informations() {
+  window.open('info.html', '_blank');
+}
 </script>
 
 </body>
